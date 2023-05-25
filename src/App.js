@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+let gameOver = false;
+
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)])
   const [currentMove, setCurrentMove] = useState(0)
@@ -12,7 +14,7 @@ export default function Game() {
     setCurrentMove(nextHistory.length - 1)
   }
 
-  function jumpTo(nextMove){
+  function jumpTo(nextMove) {
     setCurrentMove(nextMove)
   }
 
@@ -40,7 +42,7 @@ export default function Game() {
 function Board({ curPlayer, board, onPlay }) {
   function handleClick(i) {
     // bail out if the square is already played or the game has already been won
-    if (board[i] || evalGame(board)) {
+    if (board[i] || gameOver) {
       return
     }
 
@@ -94,13 +96,20 @@ function evalGame(board) {
     [2, 4, 6],
   ]
 
-  for (let winScenario of winScenarios) {
-    const winner = boardContainsWinScenario(board, winScenario)
-    if (winner) return `${winner} won the game`
-    for (let cell of board) {
-      if (!cell) return null
+  for (let i = 0; i < winScenarios.length; ++i) {
+    const winner = boardContainsWinScenario(board, winScenarios[i])
+    console.log(winner)
+    if (winner) {
+      gameOver = true;
+      return `${winner} won the game`
     }
-    return(`Cat's game.`)
+    for (let i = 0; i < board.length; ++i) {
+      // if there is an empty cell, return null to indicate that the game
+      // is not over
+      if (!board[i]) return null
+    }
+    gameOver = true;
+    return (`Cat's game.`)
   }
 }
 
